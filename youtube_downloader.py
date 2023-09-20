@@ -1,6 +1,7 @@
 from pytube import YouTube
 import ffmpeg
 import os
+import re
 
 path = os.path.abspath(os.getcwd())
 path = path + "\\"
@@ -16,11 +17,10 @@ def changeTitle(vtitle):
     
     title = str(vtitle)
 
-    title = title.replace('/','')
-    title = title.replace('.','')
-    title = title.replace('?','')
+    title = re.sub(r'[^\w\s]', '', title)
 
     return title
+    
 
 def renameFile(vtitle, num):
 
@@ -46,7 +46,7 @@ def downloadVideoPart(vres):
     l1 = list(yt.streams.filter(res=vres).itag_index)
     idx = l1[0]
     v_stream = yt.streams.get_by_itag(idx)
-    v_stream.download()
+    v_stream.download(filename=changeTitle(v_stream.title) + '.mp4')
 
     renameFile(v_stream.title, 1)
     title = changeTitle(v_stream.title)
@@ -56,11 +56,11 @@ def downloadAudioPart():
     l2 = list(yt.streams.filter(only_audio=True).itag_index)
     if 140 in l2:
         a_stream = yt.streams.get_by_itag(140)
-        a_stream.download()
+        a_stream.download(filename=changeTitle(a_stream.title) + '.mp4')
     else:
         idx = l2[0]
         a_stream = yt.streams.get_by_itag(idx)
-        a_stream.download()
+        a_stream.download(filename=changeTitle(a_stream.title) + '.mp4')
 
     renameFile(a_stream.title, 2)
 
@@ -100,3 +100,4 @@ else:
         downloadAudioPart()
 
     input("\nPress Enter to continue...")
+    
